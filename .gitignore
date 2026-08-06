@@ -1,0 +1,28 @@
+# Node
+node_modules
+.pnpm-store
+
+# Next.js
+.next
+out
+
+# Rust
+target
+
+# Environment
+.env
+.env.local
+.env.production
+
+# IDE
+.vscode
+.idea
+
+# macOS
+.DS_Store
+
+# Linux
+*~
+
+# Logs
+*.log
