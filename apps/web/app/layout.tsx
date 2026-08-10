@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { SiteShell } from "@/components/layout/site-shell";
 import { Cormorant_Garamond, IBM_Plex_Mono, Inter } from "next/font/google";
 import "./globals.css";
 
@@ -40,7 +41,11 @@ export default function RootLayout({
       <body
         className={`${cormorant.variable} ${inter.variable} ${plexMono.variable}`}
       >
-        {children}
+        <SiteShell>
+
+          {children}
+
+        </SiteShell>
       </body>
     </html>
   );
