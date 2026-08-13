@@ -1,17 +1,21 @@
-use caulfield_api::app;
+use caulfield_api::{app, config::Config};
 
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    tracing_subscriber::fmt::init();
 
-    let listener =
-        tokio::net::TcpListener::bind("0.0.0.0:3001")
-            .await
-            .unwrap();
+    let config = Config::from_env()?;
 
-    println!("API running");
+    let address = format!("{}:{}", config.host, config.port);
 
-    axum::serve(listener, app())
-        .await
-        .unwrap();
+    let listener = tokio::net::TcpListener::bind(&address).await?;
 
+    tracing::info!(
+        address = %address,
+        "Caulfield Joinery API started"
+    );
+
+    axum::serve(listener, app(&config)).await?;
+
+    Ok(())
 }

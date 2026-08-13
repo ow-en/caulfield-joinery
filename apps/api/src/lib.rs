@@ -1,25 +1,36 @@
+pub mod config;
+pub mod db;
+pub mod handlers;
+pub mod middleware;
+pub mod models;
+pub mod routes;
+pub mod services;
+
 use axum::{
-    routing::get,
-    Json,
     Router,
+    http::{HeaderValue, Method, header},
 };
+use tower_http::{cors::CorsLayer, trace::TraceLayer};
 
-use serde::Serialize;
+use crate::config::Config;
 
-#[derive(Serialize)]
-struct Health {
-    service: &'static str,
-    version: &'static str,
-}
+pub fn app(config: &Config) -> Router {
+    let frontend_origin =
+        HeaderValue::from_str(&config.frontend_url).expect("Invalid FRONTEND_URL");
 
-async fn health() -> Json<Health> {
-    Json(Health {
-        service: "caulfield-api",
-        version: "0.1.0",
-    })
-}
+    let cors = CorsLayer::new()
+        .allow_origin(frontend_origin)
+        .allow_methods([
+            Method::GET,
+            Method::POST,
+            Method::PUT,
+            Method::PATCH,
+            Method::DELETE,
+        ])
+        .allow_headers([header::CONTENT_TYPE, header::AUTHORIZATION]);
 
-pub fn app() -> Router {
     Router::new()
-        .route("/", get(health))
+        .nest("/api/v1", routes::api_routes())
+        .layer(cors)
+        .layer(TraceLayer::new_for_http())
 }
